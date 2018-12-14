@@ -366,9 +366,8 @@ void GLSheet::insertMesh(std::vector<Vertex2D> &mesh, std::vector<unsigned int> 
 {
     for(const Vertex2D &vert : v) {
         const std::map<const Vertex2D, unsigned int>::const_iterator it = meshInd.find(vert);
-        unsigned int b = it->second;
-        if(it != meshInd.end()) {
-            index.push_back(b);
+        if(it != meshInd.end()) {            
+            index.push_back(it->second);
         }
         else{
             meshInd.insert(std::pair<const Vertex2D, unsigned int>(vert, mesh.size()));

@@ -67,10 +67,10 @@ void Paint::WuLine(QVector2D first, QVector2D second, const QVector4D color)
 
 float Paint::fpart(const float x)
 {
-
+    return 0;
 }
 
 float Paint::rfpart(const float x)
 {
-
+    return 0;
 }
