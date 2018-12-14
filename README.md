@@ -1,0 +1,1 @@
+Improving in modern desktop OpenGL and learning Qt.

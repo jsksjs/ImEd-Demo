@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shaders/background.vert</file>
+        <file>shaders/background.frag</file>
+        <file>shaders/square.frag</file>
+        <file>shaders/square.vert</file>
+        <file>shaders/circle.frag</file>
+        <file>shaders/circle.vert</file>
+        <file>assets/back.png</file>
+        <file>shaders/squareOutline.frag</file>
+        <file>shaders/squareOutline.vert</file>
+    </qresource>
+</RCC>
