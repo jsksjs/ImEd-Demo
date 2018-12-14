@@ -11,7 +11,8 @@ class LayerButton : public QPushButton
     Q_OBJECT
 public:
     LayerButton(QWidget *parent = nullptr, const QString name = "Layer 000");
-    void setPreview(const QImage i);    
+    void setPreview(const QImage i);
+    QImage const& getPreview() const;
 public slots:
     void preview(const QImage i);    
 protected:

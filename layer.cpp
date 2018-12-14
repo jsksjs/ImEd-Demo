@@ -19,6 +19,20 @@ Layer::Layer(const QSize &size)
     glClearColor(back.redF(),back.greenF(),back.blueF(), 1.0f);
 }
 
+Layer::Layer(const Layer &other, QOpenGLFunctions *f)
+{
+    m_fbo = new QOpenGLFramebufferObject(other.m_fbo->size(), other.m_fbo->attachment(), GL_TEXTURE_2D, GL_RGBA8);
+    m_fbo->blitFramebuffer(m_fbo, QRect(0, 0,other.m_fbo->size().width(), other.m_fbo->size().height()),
+                           other.m_fbo, QRect(0, 0,other.m_fbo->size().width(), other.m_fbo->size().height()));
+    Bind();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    Release();
+
+    layerTarget = other.layerTarget;
+    QColor back(55, 55, 55);
+    glClearColor(back.redF(),back.greenF(),back.blueF(), 1.0f);
+}
+
 void Layer::DrawBuffer(QOpenGLFunctions &f, QOpenGLBuffer *vertex, QOpenGLBuffer *index,
                        std::vector<Vertex2D> *currentMesh, std::vector<unsigned int> *currentIndex)
 {

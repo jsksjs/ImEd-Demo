@@ -64,6 +64,12 @@ private slots:
 
     void on_Del_released();
 
+    void on_Dup_released();
+
+    void on_Up_released();
+
+    void on_Dw_released();
+
 private:
     Ui::MainWindow *ui;
 

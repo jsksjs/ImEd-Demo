@@ -51,6 +51,7 @@ public:
     void setGridEnabled(const bool e);
 
     void insertLayer();
+    void duplicateLayer();
     void deleteLayer(const int pos);
 signals:
     void scaleChanged(const double s);    

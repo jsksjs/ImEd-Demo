@@ -522,6 +522,12 @@ void GLSheet::insertLayer()
     }
 }
 
+void GLSheet::duplicateLayer()
+{
+    makeCurrent();
+    layers.insert(std::next(currentLayer), Layer(*currentLayer, &f));
+}
+
 void GLSheet::deleteLayer(const int pos)
 {
     makeCurrent();

@@ -22,6 +22,11 @@ void LayerButton::setPreview(const QImage i)
     update();
 }
 
+const QImage &LayerButton::getPreview() const
+{
+    return m_preview;
+}
+
 void LayerButton::preview(const QImage i)
 {
     setPreview(i);

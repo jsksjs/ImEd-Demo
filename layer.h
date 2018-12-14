@@ -15,6 +15,7 @@ class Layer
 {
 public:
     Layer(const QSize &size);
+    Layer(const Layer &other, QOpenGLFunctions *f);
 
     void DrawBuffer(QOpenGLFunctions &f, QOpenGLBuffer *vertex, QOpenGLBuffer *index,
               std::vector<Vertex2D> *currentMesh, std::vector<unsigned int> *currentIndex);

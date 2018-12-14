@@ -18,6 +18,8 @@
 #include <QScrollBar>
 #include <QImage>
 
+#include <QDebug>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -206,7 +208,7 @@ void MainWindow::createCanvas(const QSize size, const QPoint pos)
     // layer
     while (QLayoutItem* item = ui->layersLayout->takeAt(0) )
     {
-        Q_ASSERT( ! item->layout() ); // otherwise the layout will leak
+        Q_ASSERT(!item->layout()); // otherwise the layout will leak
         delete item->widget();
         delete item;
     }
@@ -359,7 +361,6 @@ void MainWindow::on_Del_released()
 {
     if(layerBtns->buttons().size() > 1){
         const int pos = ui->layersLayout->indexOf(lastChecked);
-        qDebug() << pos << ui->layers->children().size();
         // -1 for layout, -1 for size, so -2
         if(pos < ui->layers->children().size()-2){
             layerBtns->checkedButton()->setChecked(false);
@@ -376,4 +377,25 @@ void MainWindow::on_Del_released()
         canvas->deleteLayer(pos+1);
         update();
     }
+}
+
+void MainWindow::on_Dup_released()
+{
+    QString title = layerBtns->checkedButton()->text();
+    LayerButton *l = new LayerButton(nullptr, title);
+    ui->layersLayout->insertWidget(ui->layersLayout->indexOf(layerBtns->checkedButton()), l);
+    layerBtns->addButton(l);
+    canvas->duplicateLayer();
+    l->preview(static_cast<LayerButton*>(layerBtns->checkedButton())->getPreview());
+    numLayers++;
+}
+
+void MainWindow::on_Up_released()
+{
+
+}
+
+void MainWindow::on_Dw_released()
+{
+
 }
