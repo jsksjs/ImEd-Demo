@@ -540,3 +540,12 @@ void MainWindow::on_Dw_released()
         }
     }
 }
+
+/**
+ * @brief MainWindow::on_paintBrushCombo_activated
+ * @param option
+ */
+void MainWindow::on_paintBrushCombo_activated(const QString &option)
+{
+    canvas->transChngBrushShader(option);
+}

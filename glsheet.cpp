@@ -264,6 +264,13 @@ void GLSheet::initializeGL()
     m_program[SQUARE]->setAttributeBuffer(1, GL_FLOAT, Vertex2D::colorOffset(), Vertex2D::ColorTupleSize, Vertex2D::stride());
     m_program[SQUARE]->setAttributeBuffer(2, GL_FLOAT, Vertex2D::offsetOffset(), Vertex2D::OffsetTupleSize, Vertex2D::stride());
 
+    m_program[CIRCLE]->enableAttributeArray(0);
+    m_program[CIRCLE]->enableAttributeArray(1);
+    m_program[CIRCLE]->enableAttributeArray(2);
+    m_program[CIRCLE]->setAttributeBuffer(0, GL_FLOAT, Vertex2D::positionOffset(), Vertex2D::PositionTupleSize, Vertex2D::stride());
+    m_program[CIRCLE]->setAttributeBuffer(1, GL_FLOAT, Vertex2D::colorOffset(), Vertex2D::ColorTupleSize, Vertex2D::stride());
+    m_program[CIRCLE]->setAttributeBuffer(2, GL_FLOAT, Vertex2D::offsetOffset(), Vertex2D::OffsetTupleSize, Vertex2D::stride());
+
     m_index.release();
     m_object.release();
     m_vertex.release();
@@ -678,6 +685,20 @@ void GLSheet::swapLayer(const int pos)
 {
     makeCurrent();
     std::swap(*currentLayer, *std::prev(layers.end(), (pos+1)));
+}
+
+/**
+ * @brief GLSheet::transChngBrushShader
+ * @param option
+ */
+void GLSheet::transChngBrushShader(const QString &option)
+{
+    Shaders s;
+    if(option.toLower() == "square")
+        s = SQUARE;
+    else if(option.toLower() == "circle")
+        s = CIRCLE;
+    changeBrushShader(s);
 }
 
 /**

@@ -54,6 +54,7 @@ public:
     void duplicateLayer();
     void deleteLayer(const int pos);
     void swapLayer(const int pos);
+    void transChngBrushShader(const QString &option);
 signals:
     void scaleChanged(const double s);    
     void frameInfo(const QString info);

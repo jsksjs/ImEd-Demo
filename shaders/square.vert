@@ -5,7 +5,6 @@ layout(location = 1) in vec4 color;
 layout(location = 2) in vec3 offset;
 out vec4 vColor;
 
-
 uniform mat4 modelviewprojection;
 
 void main(void)

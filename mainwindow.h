@@ -70,6 +70,8 @@ private slots:
 
     void on_Dw_released();
 
+    void on_paintBrushCombo_activated(const QString &option);
+
 private:
     Ui::MainWindow *ui;
 
