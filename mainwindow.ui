@@ -1512,7 +1512,7 @@ QPushButton:hover:!pressed{ background-color: rgb(50,50,50); }</string>
            <string notr="true"/>
           </property>
           <property name="text">
-           <string>Del</string>
+           <string>❌</string>
           </property>
           <property name="flat">
            <bool>true</bool>
@@ -1555,7 +1555,7 @@ QPushButton:hover:!pressed{ background-color: rgb(50,50,50); }</string>
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>Up</string>
+              <string>🔼</string>
              </property>
              <property name="flat">
               <bool>true</bool>
@@ -1580,7 +1580,7 @@ QPushButton:hover:!pressed{ background-color: rgb(50,50,50); }</string>
               <string notr="true"/>
              </property>
              <property name="text">
-              <string>Dw</string>
+              <string>🔽</string>
              </property>
              <property name="flat">
               <bool>true</bool>

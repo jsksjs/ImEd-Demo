@@ -85,8 +85,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 QVector2D pos = canvas->screenCoordinates(mouseEvent->pos());
                 pos.setX(qBound(1, int(pos.x()), canvas->getOriginalSize().width()));
                 pos.setY(qBound(1, int(pos.y()), canvas->getOriginalSize().height()));
-                mouseLocation->setText(QString(tr("Pos:(%1,%2)")).arg(QString::number(pos.x()).leftJustified(4, ' '),
-                                                                      QString::number(pos.y()).rightJustified(4, ' ')));
+                mouseLocation->setText(QString(tr("Pos:(%1,%2)")).arg(QString::number(static_cast<double>(pos.x())).leftJustified(4, ' '),
+                                                                      QString::number(static_cast<double>(pos.y())).rightJustified(4, ' ')));
                 resizeDocks(docks, sizes, Qt::Horizontal);
             }
         }
@@ -354,6 +354,7 @@ void MainWindow::selectLayer(QAbstractButton *l)
     disconnect(canvas, &GLSheet::preview, lastChecked, &LayerButton::preview);
     connect(canvas, &GLSheet::preview, static_cast<LayerButton*>(l), &LayerButton::preview);
     canvas->setCurrentLayer(ui->layersLayout->indexOf(l));
+    l->setChecked(true);
     lastChecked = static_cast<LayerButton*>(l);
 }
 
@@ -361,19 +362,17 @@ void MainWindow::on_Del_released()
 {
     if(layerBtns->buttons().size() > 1){
         const int pos = ui->layersLayout->indexOf(lastChecked);
+        layerBtns->checkedButton()->setChecked(false);
         // -1 for layout, -1 for size, so -2
         if(pos < ui->layers->children().size()-2){
-            layerBtns->checkedButton()->setChecked(false);
             static_cast<LayerButton*>(ui->layersLayout->itemAt(pos+1)->widget())->setChecked(true);
         }
         else{
-            layerBtns->checkedButton()->setChecked(false);
             static_cast<LayerButton*>(ui->layersLayout->itemAt(pos-1)->widget())->setChecked(true);
         }
         selectLayer(layerBtns->checkedButton());
         QLayoutItem *item = ui->layersLayout->takeAt(pos);
         delete item->widget();
-        delete item;
         canvas->deleteLayer(pos+1);
         update();
     }
@@ -387,15 +386,33 @@ void MainWindow::on_Dup_released()
     layerBtns->addButton(l);
     canvas->duplicateLayer();
     l->preview(static_cast<LayerButton*>(layerBtns->checkedButton())->getPreview());
-    numLayers++;
 }
 
 void MainWindow::on_Up_released()
 {
-
+    if(layerBtns->buttons().size() > 1){
+        const int pos = ui->layersLayout->indexOf(lastChecked);
+        if(pos > 0){
+            QLayoutItem *item = ui->layersLayout->takeAt(pos);
+            ui->layersLayout->insertWidget(pos-1, item->widget());
+            canvas->swapLayer(pos-1);
+            static_cast<LayerButton*>(ui->layersLayout->itemAt(pos-1)->widget())->setChecked(true);
+            selectLayer(static_cast<QAbstractButton*>(item->widget()));
+            update();
+        }
+    }
 }
 
 void MainWindow::on_Dw_released()
 {
-
+    if(layerBtns->buttons().size() > 1){
+        const int pos = ui->layersLayout->indexOf(lastChecked);
+        if(pos < layerBtns->buttons().size()-1){
+            QLayoutItem *item = ui->layersLayout->takeAt(pos);
+            ui->layersLayout->insertWidget(pos+1, item->widget());
+            canvas->swapLayer(pos+1);
+            selectLayer(static_cast<QAbstractButton*>(item->widget()));
+            update();
+        }
+    }
 }

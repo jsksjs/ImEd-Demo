@@ -53,6 +53,7 @@ public:
     void insertLayer();
     void duplicateLayer();
     void deleteLayer(const int pos);
+    void swapLayer(const int pos);
 signals:
     void scaleChanged(const double s);    
     void frameInfo(const QString info);

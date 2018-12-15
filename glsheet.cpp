@@ -536,6 +536,12 @@ void GLSheet::deleteLayer(const int pos)
     }
 }
 
+void GLSheet::swapLayer(const int pos)
+{
+    makeCurrent();
+    std::swap(*currentLayer, *std::prev(layers.end(), (pos+1)));
+}
+
 void GLSheet::setCurrentLayer(const int pos)
 {
     currentLayer = std::prev(layers.end(), (pos+1));
