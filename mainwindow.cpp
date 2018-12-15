@@ -20,6 +20,10 @@
 
 #include <QDebug>
 
+/**
+ * @brief MainWindow::MainWindow
+ * @param parent
+ */
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -38,31 +42,56 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->paintBrushCombo->addItems(QStringList({"Square", "Circle"}));
 }
 
+/**
+ * @brief MainWindow::~MainWindow
+ */
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+/**
+ * @brief MainWindow::on_toolDock_dockLocationChanged
+ * @param area
+ */
 void MainWindow::on_toolDock_dockLocationChanged(const Qt::DockWidgetArea &area)
 {
     dockPadding(area, ui->toolDock);
 }
 
+/**
+ * @brief MainWindow::on_optionDock_dockLocationChanged
+ * @param area
+ */
 void MainWindow::on_optionDock_dockLocationChanged(const Qt::DockWidgetArea &area)
 {
     dockPadding(area, ui->optionDock);
 }
 
+/**
+ * @brief MainWindow::on_colorDock_dockLocationChanged
+ * @param area
+ */
 void MainWindow::on_colorDock_dockLocationChanged(const Qt::DockWidgetArea &area)
 {
     dockPadding(area, ui->colorDock);
 }
 
+/**
+ * @brief MainWindow::on_layerDock_dockLocationChanged
+ * @param area
+ */
 void MainWindow::on_layerDock_dockLocationChanged(const Qt::DockWidgetArea &area)
 {
     dockPadding(area, ui->layerDock);
 }
 
+/**
+ * @brief MainWindow::eventFilter
+ * @param obj
+ * @param event
+ * @return
+ */
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseMove) {
@@ -118,6 +147,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
+/**
+ * @brief MainWindow::dockPadding
+ * @param area
+ * @param obj
+ */
 void MainWindow::dockPadding(const Qt::DockWidgetArea &area, QDockWidget *obj)
 {
     switch(area) {
@@ -138,6 +172,9 @@ void MainWindow::dockPadding(const Qt::DockWidgetArea &area, QDockWidget *obj)
     }
 }
 
+/**
+ * @brief MainWindow::statusWidgets
+ */
 void MainWindow::statusWidgets()
 {
     frames = new QLabel();
@@ -157,6 +194,10 @@ void MainWindow::statusWidgets()
     statusBar()->addWidget(zoomPercent);
 }
 
+/**
+ * @brief MainWindow::resizeEvent
+ * @param event
+ */
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
@@ -166,6 +207,11 @@ void MainWindow::resizeEvent(QResizeEvent *event)
     }
 }
 
+/**
+ * @brief MainWindow::createCanvas
+ * @param size
+ * @param pos
+ */
 void MainWindow::createCanvas(const QSize size, const QPoint pos)
 {
     centralWidget()->layout()->removeWidget(canvas);
@@ -230,16 +276,29 @@ void MainWindow::createCanvas(const QSize size, const QPoint pos)
             [=](QAbstractButton *button){ this->selectLayer(button); });
 }
 
+/**
+ * @brief MainWindow::grid
+ * @param e
+ */
 void MainWindow::grid(const bool e)
 {
     canvas->setGridEnabled(e);
 }
 
+/**
+ * @brief MainWindow::colorToNVecF
+ * @param color
+ * @return
+ */
 QVector4D MainWindow::colorToNVecF(const QColor color)
 {
     return QVector4D(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
+/**
+ * @brief MainWindow::reinitializeCanvas
+ * @param size
+ */
 void MainWindow::reinitializeCanvas(const QSize size)
 {
     QPoint curr = canvas->pos();
@@ -247,11 +306,20 @@ void MainWindow::reinitializeCanvas(const QSize size)
     createCanvas(size, curr);
 }
 
+/**
+ * @brief MainWindow::signOf
+ * @param x
+ * @return
+ */
 int MainWindow::signOf(const float x)
 {
     return (x > 0) - (x < 0);
 }
 
+/**
+ * @brief MainWindow::createDialog
+ * @param title
+ */
 void MainWindow::createDialog(const QString title)
 {
     option = new OptionDialog(this, title, canvas->getOriginalSize());
@@ -259,6 +327,11 @@ void MainWindow::createDialog(const QString title)
     option->show();
 }
 
+/**
+ * @brief MainWindow::zoomToMouse
+ * @param wheel
+ * @param incrementValue
+ */
 void MainWindow::zoomToMouse(const QWheelEvent *wheel, const double incrementValue)
 {
     const double old = zoomPercent->value() / 100;
@@ -272,37 +345,59 @@ void MainWindow::zoomToMouse(const QWheelEvent *wheel, const double incrementVal
     canvas->translate(delta.toPoint());
 }
 
+/**
+ * @brief MainWindow::center
+ */
 void MainWindow::center()
 {
     canvas->moveToCenter();
 }
 
+/**
+ * @brief MainWindow::left
+ */
 void MainWindow::left()
 {
     canvas->moveToLeft();
 }
 
+/**
+ * @brief MainWindow::right
+ */
 void MainWindow::right()
 {
     canvas->moveToRight();
 }
 
+/**
+ * @brief MainWindow::fit
+ */
 void MainWindow::fit()
 {
     canvas->fitScreen();
 }
 
+/**
+ * @brief MainWindow::original
+ */
 void MainWindow::original()
 {
     canvas->scalePercent(100.0);
 }
 
+/**
+ * @brief MainWindow::showEvent
+ * @param event
+ */
 void MainWindow::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
     canvas->moveToCenter();
 }
 
+/**
+ * @brief MainWindow::on_colPrimary_released
+ */
 void MainWindow::on_colPrimary_released()
 {
     pColor = primary->getColor(pColor, this, tr("Choose Primary"), QColorDialog::DontUseNativeDialog | QColorDialog::ShowAlphaChannel);
@@ -313,6 +408,9 @@ void MainWindow::on_colPrimary_released()
     }
 }
 
+/**
+ * @brief MainWindow::on_colSecondary_released
+ */
 void MainWindow::on_colSecondary_released()
 {
     sColor = secondary->getColor(sColor, this, tr("Choose Secondary"), QColorDialog::DontUseNativeDialog | QColorDialog::ShowAlphaChannel);
@@ -323,6 +421,10 @@ void MainWindow::on_colSecondary_released()
     }
 }
 
+/**
+ * @brief MainWindow::on_colorDock_topLevelChanged
+ * @param topLevel
+ */
 void MainWindow::on_colorDock_topLevelChanged(bool topLevel)
 {
     QWidget *contents = ui->colDockContents;
@@ -334,11 +436,17 @@ void MainWindow::on_colorDock_topLevelChanged(bool topLevel)
     }
 }
 
+/**
+ * @brief MainWindow::dialogNew
+ */
 void MainWindow::dialogNew()
 {
     createDialog("New");
 }
 
+/**
+ * @brief MainWindow::on_New_released
+ */
 void MainWindow::on_New_released()
 {
     QString title = QString("Layer %1").arg(numLayers);
@@ -349,6 +457,10 @@ void MainWindow::on_New_released()
     numLayers++;
 }
 
+/**
+ * @brief MainWindow::selectLayer
+ * @param l
+ */
 void MainWindow::selectLayer(QAbstractButton *l)
 {
     disconnect(canvas, &GLSheet::preview, lastChecked, &LayerButton::preview);
@@ -358,6 +470,9 @@ void MainWindow::selectLayer(QAbstractButton *l)
     lastChecked = static_cast<LayerButton*>(l);
 }
 
+/**
+ * @brief MainWindow::on_Del_released
+ */
 void MainWindow::on_Del_released()
 {
     if(layerBtns->buttons().size() > 1){
@@ -378,6 +493,9 @@ void MainWindow::on_Del_released()
     }
 }
 
+/**
+ * @brief MainWindow::on_Dup_released
+ */
 void MainWindow::on_Dup_released()
 {
     QString title = layerBtns->checkedButton()->text();
@@ -388,6 +506,9 @@ void MainWindow::on_Dup_released()
     l->preview(static_cast<LayerButton*>(layerBtns->checkedButton())->getPreview());
 }
 
+/**
+ * @brief MainWindow::on_Up_released
+ */
 void MainWindow::on_Up_released()
 {
     if(layerBtns->buttons().size() > 1){
@@ -403,6 +524,9 @@ void MainWindow::on_Up_released()
     }
 }
 
+/**
+ * @brief MainWindow::on_Dw_released
+ */
 void MainWindow::on_Dw_released()
 {
     if(layerBtns->buttons().size() > 1){

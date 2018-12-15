@@ -1,6 +1,13 @@
 #include "glsheet.h"
 
 
+/**
+ * @brief GLSheet::GLSheet
+ * @param parent
+ * @param wh
+ * @param primary
+ * @param secondary
+ */
 GLSheet::GLSheet(QWidget *parent, const QSize wh, const QVector4D primary, const QVector4D secondary)
     : QOpenGLWidget(parent), f(), m_vertex(QOpenGLBuffer::VertexBuffer), m_index(QOpenGLBuffer::IndexBuffer),
     lastMouseVertex(QVector2D(0,0), QVector4D(0,0,0,0)),
@@ -18,7 +25,7 @@ GLSheet::GLSheet(QWidget *parent, const QSize wh, const QVector4D primary, const
     // BRUSH PREVIEW (OUTLINE)
     // ADD POPOUT MENUS TO "PIN" ACTIONS THAT ALLOW FOR "TOP | MIDDLE | BOTTOM" PINNINGS EACH FOR LEFT, RIGHT, CENTER OPTION
     originalSize = wh;
-    actualSize = QSize(originalSize.width() * trans.GetScale().x(), originalSize.height() * trans.GetScale().y());
+    actualSize = QSize(static_cast<int>(originalSize.width() * trans.GetScale().x()), static_cast<int>(originalSize.height() * trans.GetScale().y()));
     drawRGBA = primary;
     secondaryRGBA = secondary;
 
@@ -41,6 +48,9 @@ GLSheet::GLSheet(QWidget *parent, const QSize wh, const QVector4D primary, const
 
 }
 
+/**
+ * @brief GLSheet::~GLSheet
+ */
 GLSheet::~GLSheet()
 {
     makeCurrent();
@@ -57,21 +67,37 @@ GLSheet::~GLSheet()
     doneCurrent();
 }
 
+/**
+ * @brief GLSheet::secondaryColor
+ * @param secondary
+ */
 void GLSheet::secondaryColor(const QVector4D secondary)
 {
     secondaryRGBA = secondary;
 }
 
+/**
+ * @brief GLSheet::drawColor
+ * @param primary
+ */
 void GLSheet::drawColor(const QVector4D primary)
 {
     drawRGBA = primary;
 }
 
+/**
+ * @brief GLSheet::getOriginalSize
+ * @return
+ */
 QSize GLSheet::getOriginalSize() const
 {
     return originalSize;
 }
 
+/**
+ * @brief GLSheet::getActualSize
+ * @return
+ */
 QSize GLSheet::getActualSize() const
 {
     return actualSize;
@@ -88,7 +114,7 @@ QVector2D GLSheet::glCoordinates(const QPoint position, const bool integers)
     QVector2D point = QVector3D(position.x() - (trans.GetPos().x() * (trans.GetScale().x()-1)),
                                 (this->height() - 1.0f - position.y()) + (trans.GetPos().y() * (trans.GetScale().y()-1)), 0)
                       .unproject(trans.GetModel(), cam.GetViewProjection(),
-                                 QRect(trans.GetPos().x(), -trans.GetPos().y(), this->width(), this->height())).toVector2D();
+                                 QRect(static_cast<int>(trans.GetPos().x()), static_cast<int>(-trans.GetPos().y()), this->width(), this->height())).toVector2D();
     if(integers) {
         point.setX(floorf(point.x()));
         point.setY(ceilf(point.y()));
@@ -96,6 +122,11 @@ QVector2D GLSheet::glCoordinates(const QPoint position, const bool integers)
     return point;
 }
 
+/**
+ * @brief GLSheet::screenCoordinates
+ * @param position
+ * @return
+ */
 QVector2D GLSheet::screenCoordinates(const QPoint position)
 {
     QVector2D point = QVector3D(position.x(), -position.y() - 1.0f + this->height(), 0).unproject(trans.GetModel(), cam.GetViewProjection(),
@@ -106,11 +137,18 @@ QVector2D GLSheet::screenCoordinates(const QPoint position)
     return point;
 }
 
+/**
+ * @brief GLSheet::getPosDelta
+ * @return
+ */
 QPoint GLSheet::getPosDelta()
 {
     return trans.GetPos().toPoint();
 }
 
+/**
+ * @brief GLSheet::fitScreen
+ */
 void GLSheet::fitScreen()
 {
     if((this->width() - originalSize.width()) / double(this->width()) < (this->height() - originalSize.height()) / double(this->height()))
@@ -120,32 +158,52 @@ void GLSheet::fitScreen()
     moveToCenter();
 }
 
+/**
+ * @brief GLSheet::moveToCenter
+ */
 void GLSheet::moveToCenter()
 {
     setPos(geometry().center() - QPoint(actualSize.width(), actualSize.height())/2);
 }
 
+/**
+ * @brief GLSheet::moveToLeft
+ */
 void GLSheet::moveToLeft()
 {
     setPos(QPoint(0, geometry().center().y() - actualSize.height()/2));
 }
 
+/**
+ * @brief GLSheet::moveToRight
+ */
 void GLSheet::moveToRight()
 {
     setPos(QPoint(geometry().right() - actualSize.width(),
                   geometry().center().y() - actualSize.height()/2));
 }
 
+/**
+ * @brief GLSheet::translate
+ * @param p
+ */
 void GLSheet::translate(const QPoint &p)
 {
     trans.SetPos(QVector3D(int(trans.GetPos().x() + p.x()), int(trans.GetPos().y() + p.y()), 0));
 }
 
+/**
+ * @brief GLSheet::setPos
+ * @param p
+ */
 void GLSheet::setPos(const QPoint &p)
 {
     trans.SetPos(QVector3D(p.x(), p.y(), 0));
 }
 
+/**
+ * @brief GLSheet::initializeGL
+ */
 void GLSheet::initializeGL()
 {
     f.initializeOpenGLFunctions();
@@ -222,10 +280,13 @@ void GLSheet::initializeGL()
     insertLayer();
 
     QColor back(55, 55, 55);
-    glClearColor(back.redF(),back.greenF(),back.blueF(), 1.0f);
+    glClearColor(static_cast<GLclampf>(back.redF()), static_cast<GLclampf>(back.greenF()), static_cast<GLclampf>(back.blueF()), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
+/**
+ * @brief GLSheet::paintGL
+ */
 void GLSheet::paintGL()
 {
     if(currentLayer == layers.end())
@@ -244,9 +305,9 @@ void GLSheet::paintGL()
                 m_program[TEXTURE]->setAttributeBuffer(1, GL_FLOAT, Vertex2D::texCoordsOffset(), Vertex2D::TexCoordsTupleSize, Vertex2D::stride());
                 m_program[TEXTURE]->setUniformValue(m_program[TEXTURE]->uniformLocation("sampler"), 0);
                 m_program[TEXTURE]->setUniformValue(m_program[TEXTURE]->uniformLocation("modelviewprojection"), cam.GetViewProjection() * trans.GetModel());
-                m_vertex.allocate(backTarget.data(), sizeof(backTarget.data()[0]) * backTarget.size());
-                m_index.allocate(layerTargetIndex.data(), sizeof(layerTargetIndex.data()[0]) * layerTargetIndex.size());
-                glDrawElements(GL_TRIANGLES, layerTargetIndex.size(), GL_UNSIGNED_INT, nullptr);
+                m_vertex.allocate(backTarget.data(), static_cast<int>(sizeof(backTarget.data()[0]) * backTarget.size()));
+                m_index.allocate(layerTargetIndex.data(), static_cast<int>(sizeof(layerTargetIndex.data()[0]) * layerTargetIndex.size()));
+                glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(layerTargetIndex.size()), GL_UNSIGNED_INT, nullptr);
 
                 glEnable(GL_BLEND);
                 // FIX
@@ -276,9 +337,9 @@ void GLSheet::paintGL()
                                                                           height(), 0, 1, -1).GetViewProjection() * trans.GetModel());
                     glViewport(0,0, width(), height());
                     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                    m_vertex.allocate(grid.data(), sizeof(grid.data()[0]) * grid.size());
-                    m_index.allocate(gridIndex.data(), sizeof(gridIndex.data()[0]) * gridIndex.size());
-                    glDrawElements(GL_TRIANGLES, gridIndex.size(), GL_UNSIGNED_INT, nullptr);
+                    m_vertex.allocate(grid.data(), static_cast<int>(sizeof(grid.data()[0]) * grid.size()));
+                    m_index.allocate(gridIndex.data(), static_cast<int>(sizeof(gridIndex.data()[0]) * gridIndex.size()));
+                    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(gridIndex.size()), GL_UNSIGNED_INT, nullptr);
                 }
             }
             m_program[currentBrushShader]->release();
@@ -290,12 +351,21 @@ void GLSheet::paintGL()
     update();
 }
 
+/**
+ * @brief GLSheet::resizeGL
+ * @param w
+ * @param h
+ */
 void GLSheet::resizeGL(const int w, const int h)
 {
     glViewport(0, 0, w, h);
     cam = Camera(QVector3D(0,0,0), 0, w, h, 0, 1, -1);
 }
 
+/**
+ * @brief GLSheet::mouseMoveEvent
+ * @param event
+ */
 void GLSheet::mouseMoveEvent(QMouseEvent *event)
 {
     if(event->buttons() == Qt::LeftButton) {
@@ -312,6 +382,10 @@ void GLSheet::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief GLSheet::mouseReleaseEvent
+ * @param event
+ */
 void GLSheet::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
@@ -327,11 +401,15 @@ void GLSheet::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief GLSheet::mousePressEvent
+ * @param event
+ */
 void GLSheet::mousePressEvent(QMouseEvent *event)
 {
     QVector2D point = glCoordinates(event->pos());
-    const int x = point.x();
-    const int y = point.y();
+    const int x = static_cast<int>(point.x());
+    const int y = static_cast<int>(point.y());
     QVector4D color;
     lastMouseVertex = Vertex2D(QVector2D(x, y), color);
     if(event->buttons() == Qt::LeftButton) {
@@ -356,11 +434,22 @@ void GLSheet::mousePressEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief GLSheet::changeBrushShader
+ * @param s
+ */
 void GLSheet::changeBrushShader(GLSheet::Shaders &s)
 {
     currentBrushShader = s;
 }
 
+/**
+ * @brief GLSheet::insertMesh
+ * @param mesh
+ * @param index
+ * @param meshInd
+ * @param v
+ */
 void GLSheet::insertMesh(std::vector<Vertex2D> &mesh, std::vector<unsigned int> &index,
                          std::map<const Vertex2D, unsigned int> &meshInd, const std::vector<Vertex2D> &v)
 {
@@ -371,12 +460,17 @@ void GLSheet::insertMesh(std::vector<Vertex2D> &mesh, std::vector<unsigned int> 
         }
         else{
             meshInd.insert(std::pair<const Vertex2D, unsigned int>(vert, mesh.size()));
-            index.push_back(mesh.size());
+            index.push_back(static_cast<unsigned int>(mesh.size()));
             mesh.push_back(vert);
         }
     }
 }
 
+/**
+ * @brief GLSheet::drawBrush
+ * @param point
+ * @param color
+ */
 void GLSheet::drawBrush(const QVector2D point, const QVector4D color)
 {
     if(!currentMesh.empty() && draw) {
@@ -392,8 +486,8 @@ void GLSheet::drawBrush(const QVector2D point, const QVector4D color)
         else
             WuLine(first, point, color);
     }
-    const int x = point.x();
-    const int y = point.y();
+    const int x = static_cast<int>(point.x());
+    const int y = static_cast<int>(point.y());
     lastMouseVertex = Vertex2D(QVector2D(x, y), color);
     insertMesh(currentMesh, currentIndex, currentMeshInd,
                std::vector<Vertex2D> {Vertex2D(QVector2D(x, y), color, QVector2D(-m_brushSize, m_brushSize)),
@@ -405,6 +499,9 @@ void GLSheet::drawBrush(const QVector2D point, const QVector4D color)
     draw = true;
 }
 
+/**
+ * @brief GLSheet::frameTime
+ */
 void GLSheet::frameTime()
 {
     std::chrono::time_point<std::chrono::high_resolution_clock> currentTime = std::chrono::high_resolution_clock::now();
@@ -416,18 +513,24 @@ void GLSheet::frameTime()
     }
 }
 
+/**
+ * @brief GLSheet::BresenhamLineLow
+ * @param first
+ * @param second
+ * @param color
+ */
 void GLSheet::BresenhamLineLow(const QVector2D &first, const QVector2D &second, const QVector4D &color)
 {
-    int dx = second.x() - first.x();
-    int dy = second.y() - first.y();
+    int dx = static_cast<int>(second.x() - first.x());
+    int dy = static_cast<int>(second.y() - first.y());
     short yi = 1;
     if(dy < 0) {
         yi = -1;
         dy = -dy;
     }
     int D = 2 * dy - dx;
-    int y = first.y();
-    for(int x = first.x(); x < second.x(); x++) {
+    int y = static_cast<int>(first.y());
+    for(int x = static_cast<int>(first.x()); x < second.x(); x++) {
         insertMesh(currentMesh, currentIndex, currentMeshInd,
                    std::vector<Vertex2D> {Vertex2D(QVector2D(x, y), color, QVector2D(-m_brushSize, m_brushSize)),
                                           Vertex2D(QVector2D(x, y-1), color, QVector2D(-m_brushSize, -m_brushSize)),
@@ -443,18 +546,24 @@ void GLSheet::BresenhamLineLow(const QVector2D &first, const QVector2D &second, 
     }
 }
 
+/**
+ * @brief GLSheet::BresenhamLineHigh
+ * @param first
+ * @param second
+ * @param color
+ */
 void GLSheet::BresenhamLineHigh(const QVector2D &first, const QVector2D &second, const QVector4D &color)
 {
-    int dx = second.x() - first.x();
-    int dy = second.y() - first.y();
+    int dx = static_cast<int>(second.x() - first.x());
+    int dy = static_cast<int>(second.y() - first.y());
     short xi = 1;
     if(dx < 0) {
         xi = -1;
         dx = -dx;
     }
     int D = 2 * dx - dy;
-    int x = first.x();
-    for(int y = first.y(); y < second.y(); y++) {
+    int x = static_cast<int>(first.x());
+    for(int y = static_cast<int>(first.y()); y < second.y(); y++) {
         insertMesh(currentMesh, currentIndex, currentMeshInd,
                    std::vector<Vertex2D> {Vertex2D(QVector2D(x, y), color, QVector2D(-m_brushSize, m_brushSize)),
                                           Vertex2D(QVector2D(x, y-1), color, QVector2D(-m_brushSize, -m_brushSize)),
@@ -470,16 +579,31 @@ void GLSheet::BresenhamLineHigh(const QVector2D &first, const QVector2D &second,
     }
 }
 
+/**
+ * @brief GLSheet::fpart
+ * @param x
+ * @return
+ */
 float GLSheet::fpart(const float x)
 {
     return x - floorf(x);
 }
 
+/**
+ * @brief GLSheet::rfpart
+ * @param x
+ * @return
+ */
 float GLSheet::rfpart(const float x)
 {
     return 1 - fpart(x);
 }
 
+/**
+ * @brief GLSheet::fillGrid
+ * @param width
+ * @param color
+ */
 void GLSheet::fillGrid(const float width, const QVector4D color)
 {
     grid.clear();
@@ -489,7 +613,7 @@ void GLSheet::fillGrid(const float width, const QVector4D color)
     // horizontal
     const QVector2D origin = QVector2D(0,0);
     const QVector2D end = QVector2D(originalSize.width(), originalSize.height());
-    for(int y = origin.y(); y <= end.y(); y++) {
+    for(int y = static_cast<int>(origin.y()); y <= end.y(); y++) {
         insertMesh(grid, gridIndex, gridMeshInd,
                    {Vertex2D(QVector2D(origin.x(), y), col, QVector2D(-width, -width)),
                     Vertex2D(QVector2D(end.x(), y), col, QVector2D(0, -width)),
@@ -499,7 +623,7 @@ void GLSheet::fillGrid(const float width, const QVector4D color)
                     Vertex2D(QVector2D(end.x(), y), col, QVector2D(0, -width))});
     }
     // vertical
-    for(int x = origin.x(); x <= end.x(); x++) {
+    for(int x = static_cast<int>(origin.x()); x <= end.x(); x++) {
         insertMesh(grid, gridIndex, gridMeshInd,
                    {Vertex2D(QVector2D(x, origin.y()), col, QVector2D(width, 0)),
                     Vertex2D(QVector2D(x, end.y()), col, QVector2D(width, 0)),
@@ -510,6 +634,9 @@ void GLSheet::fillGrid(const float width, const QVector4D color)
     }
 }
 
+/**
+ * @brief GLSheet::insertLayer
+ */
 void GLSheet::insertLayer()
 {
     makeCurrent();
@@ -522,12 +649,19 @@ void GLSheet::insertLayer()
     }
 }
 
+/**
+ * @brief GLSheet::duplicateLayer
+ */
 void GLSheet::duplicateLayer()
 {
     makeCurrent();
     layers.insert(std::next(currentLayer), Layer(*currentLayer, &f));
 }
 
+/**
+ * @brief GLSheet::deleteLayer
+ * @param pos
+ */
 void GLSheet::deleteLayer(const int pos)
 {
     makeCurrent();
@@ -536,22 +670,40 @@ void GLSheet::deleteLayer(const int pos)
     }
 }
 
+/**
+ * @brief GLSheet::swapLayer
+ * @param pos
+ */
 void GLSheet::swapLayer(const int pos)
 {
     makeCurrent();
     std::swap(*currentLayer, *std::prev(layers.end(), (pos+1)));
 }
 
+/**
+ * @brief GLSheet::setCurrentLayer
+ * @param pos
+ */
 void GLSheet::setCurrentLayer(const int pos)
 {
     currentLayer = std::prev(layers.end(), (pos+1));
 }
 
+/**
+ * @brief GLSheet::setGridEnabled
+ * @param e
+ */
 void GLSheet::setGridEnabled(const bool e)
 {
     drawGrid = e;
 }
 
+/**
+ * @brief GLSheet::WuLine
+ * @param first
+ * @param second
+ * @param color
+ */
 void GLSheet::WuLine(QVector2D first, QVector2D second, const QVector4D color)
 {
     const bool steep = std::abs(second.y() - first.y()) > std::abs(second.x() - first.x());
@@ -584,13 +736,13 @@ void GLSheet::WuLine(QVector2D first, QVector2D second, const QVector4D color)
     else
         gradient = dy / dx;
 
-    int xend = roundf(first.x());
+    int xend = static_cast<int>(roundf(first.x()));
     float yend = first.y() + gradient * (xend - first.x());
 
     float xgap = rfpart(first.x() + 0.5f);
 
     const int xpxl1 = xend;
-    const int ypxl1 = floor(yend);
+    const int ypxl1 = static_cast<int>(floor(yend));
 
     if(steep) {
         QVector4D tcolor = color;
@@ -642,7 +794,7 @@ void GLSheet::WuLine(QVector2D first, QVector2D second, const QVector4D color)
     xgap = fpart(second.x() + 0.5f);
 
     const int xpxl2 = xend;
-    const int ypxl2 = floor(yend);
+    const int ypxl2 = static_cast<int>(floor(yend));
 
     if(steep) {
         QVector4D tcolor = color;
@@ -733,7 +885,12 @@ void GLSheet::WuLine(QVector2D first, QVector2D second, const QVector4D color)
     }
 }
 
-
+/**
+ * @brief GLSheet::BresenhamLine
+ * @param first
+ * @param second
+ * @param color
+ */
 void GLSheet::BresenhamLine(const QVector2D &first, const QVector2D &second, const QVector4D &color)
 {
     if(std::abs(second.y() - first.y()) < std::abs(second.x() - first.x())) {
@@ -750,31 +907,51 @@ void GLSheet::BresenhamLine(const QVector2D &first, const QVector2D &second, con
     }
 }
 
+/**
+ * @brief GLSheet::scale
+ * @param s
+ */
 void GLSheet::scale(const double s)
 {
-    trans.SetScale(QVector3D(s, s, 1));
+    trans.SetScale(QVector3D(static_cast<float>(s), static_cast<float>(s), 1));
     actualSize = originalSize * s;
     emit scaleChanged(s*100);
 }
 
+/**
+ * @brief GLSheet::scalePercent
+ * @param s
+ */
 void GLSheet::scalePercent(const double s)
 {
     const double percent = s/100;
-    trans.SetScale(QVector3D(percent, percent, 1));
+    trans.SetScale(QVector3D(static_cast<float>(percent), static_cast<float>(percent), 1));
     actualSize = originalSize * percent;
     emit scaleChanged(s);
 }
 
+/**
+ * @brief GLSheet::brushSize
+ * @param s
+ */
 void GLSheet::brushSize(const int s)
 {
     m_brushSize = (s-1)/2;
 }
 
+/**
+ * @brief GLSheet::antialiased
+ * @param aa
+ */
 void GLSheet::antialiased(const bool aa)
 {
     m_aa = aa;
 }
 
+/**
+ * @brief GLSheet::parentMoved
+ * @param p
+ */
 void GLSheet::parentMoved(const QPoint p)
 {
     translate(p);

@@ -1,6 +1,12 @@
 #include "optiondialog.h"
 #include "ui_optiondialog.h"
 
+/**
+ * @brief OptionDialog::OptionDialog
+ * @param parent
+ * @param title
+ * @param current
+ */
 OptionDialog::OptionDialog(QWidget *parent, const QString title, const QSize current) :
     QDialog(parent),
     ui(new Ui::OptionDialog)
@@ -11,11 +17,17 @@ OptionDialog::OptionDialog(QWidget *parent, const QString title, const QSize cur
     ui->heightNum->setValue(current.height());
 }
 
+/**
+ * @brief OptionDialog::~OptionDialog
+ */
 OptionDialog::~OptionDialog()
 {
     delete ui;
 }
 
+/**
+ * @brief OptionDialog::on_buttonBox_accepted
+ */
 void OptionDialog::on_buttonBox_accepted()
 {
     const int widthVal = ui->widthNum->value();

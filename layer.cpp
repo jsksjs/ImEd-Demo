@@ -2,6 +2,10 @@
 
 std::vector<unsigned int> Layer::layerTargetIndex = {0, 2, 1, 3, 1, 2};
 
+/**
+ * @brief Layer::Layer
+ * @param size
+ */
 Layer::Layer(const QSize &size)
 {    
     m_fbo = new QOpenGLFramebufferObject(size, QOpenGLFramebufferObject::NoAttachment, GL_TEXTURE_2D, GL_RGBA8);
@@ -19,6 +23,11 @@ Layer::Layer(const QSize &size)
     glClearColor(back.redF(),back.greenF(),back.blueF(), 1.0f);
 }
 
+/**
+ * @brief Layer::Layer
+ * @param other
+ * @param f
+ */
 Layer::Layer(const Layer &other, QOpenGLFunctions *f)
 {
     m_fbo = new QOpenGLFramebufferObject(other.m_fbo->size(), other.m_fbo->attachment(), GL_TEXTURE_2D, GL_RGBA8);
@@ -33,6 +42,14 @@ Layer::Layer(const Layer &other, QOpenGLFunctions *f)
     glClearColor(back.redF(),back.greenF(),back.blueF(), 1.0f);
 }
 
+/**
+ * @brief Layer::DrawBuffer
+ * @param f
+ * @param vertex
+ * @param index
+ * @param currentMesh
+ * @param currentIndex
+ */
 void Layer::DrawBuffer(QOpenGLFunctions &f, QOpenGLBuffer *vertex, QOpenGLBuffer *index,
                        std::vector<Vertex2D> *currentMesh, std::vector<unsigned int> *currentIndex)
 {
@@ -43,6 +60,10 @@ void Layer::DrawBuffer(QOpenGLFunctions &f, QOpenGLBuffer *vertex, QOpenGLBuffer
     Release();    
 }
 
+/**
+ * @brief Layer::DrawTexture
+ * @param vertex
+ */
 void Layer::DrawTexture(QOpenGLBuffer *vertex)
 {
     glBindTexture(GL_TEXTURE_2D, m_fbo->texture());
@@ -50,17 +71,27 @@ void Layer::DrawTexture(QOpenGLBuffer *vertex)
     glDrawElements(GL_TRIANGLES, layerTargetIndex.size(), GL_UNSIGNED_INT, nullptr);
 }
 
+/**
+ * @brief Layer::Bind
+ */
 void Layer::Bind()
 {
     m_fbo->bind();
     glViewport(0,0, m_size.width(), m_size.height());
 }
 
+/**
+ * @brief Layer::Release
+ */
 void Layer::Release()
 {
     m_fbo->release();
 }
 
+/**
+ * @brief Layer::Image
+ * @return
+ */
 QImage Layer::Image()
 {
     return m_fbo->toImage();

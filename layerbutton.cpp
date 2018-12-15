@@ -4,6 +4,11 @@
 #include <QStylePainter>
 #include <QDebug>
 
+/**
+ * @brief LayerButton::LayerButton
+ * @param parent
+ * @param name
+ */
 LayerButton::LayerButton(QWidget *parent, QString name) : QPushButton(parent)
 {
     this->setMinimumSize(QSize(50, 80));
@@ -13,6 +18,10 @@ LayerButton::LayerButton(QWidget *parent, QString name) : QPushButton(parent)
     this->setText(name);    
 }
 
+/**
+ * @brief LayerButton::setPreview
+ * @param i
+ */
 void LayerButton::setPreview(const QImage i)
 {
     m_preview = i;
@@ -22,16 +31,27 @@ void LayerButton::setPreview(const QImage i)
     update();
 }
 
+/**
+ * @brief LayerButton::getPreview
+ * @return
+ */
 const QImage &LayerButton::getPreview() const
 {
     return m_preview;
 }
 
+/**
+ * @brief LayerButton::preview
+ * @param i
+ */
 void LayerButton::preview(const QImage i)
 {
     setPreview(i);
 }
 
+/**
+ * @brief LayerButton::paintEvent
+ */
 void LayerButton::paintEvent(QPaintEvent *)
 {
     QStylePainter p(this);
@@ -42,7 +62,11 @@ void LayerButton::paintEvent(QPaintEvent *)
     a.drawImage(QRectF(5, 5, m_scaleWidth, m_scaleHeight), m_preview, QRectF(0, 0, m_preview.width(), m_preview.height()));
 }
 
+/**
+ * @brief LayerButton::mouseDoubleClickEvent
+ * @param event
+ */
 void LayerButton::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    //dialogue, edit name
+    //dialogue, option menu for layer, can change name
 }

@@ -3,11 +3,12 @@
 #include <QDebug>
 #include <QMoveEvent>
 
-CentralContainer::CentralContainer(QWidget *parent) : QWidget(parent)
-{
+CentralContainer::CentralContainer(QWidget *parent) : QWidget(parent){ }
 
-}
-
+/**
+ * @brief CentralContainer::moveEvent
+ * @param event
+ */
 void CentralContainer::moveEvent(QMoveEvent *event)
 {
     QWidget::moveEvent(event);

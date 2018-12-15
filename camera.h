@@ -6,7 +6,7 @@
 
 class Camera
 {
-public:    
+public:
     Camera(const QVector3D &pos, const float left, const float right, const float bottom, const float top, const float nearPlane, const float farPlane);
 
     QMatrix4x4 GetViewProjection() const;
