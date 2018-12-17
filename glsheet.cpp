@@ -14,9 +14,6 @@ GLSheet::GLSheet(QWidget *parent, const QSize wh, const QVector4D primary, const
     cam(QVector3D(0,0,0), 0, this->width(), this->height(), 0, 1, -1)
 {
     // TODO: FIX ALPHA BETWEEN TEXTURES
-    // ADD DUPLICATE LAYER
-    // ADD "RAISE" LAYER
-    // ADD "LOWER" LAYER
     // CREATE "MESH" OBJECT TO STORE VERTEX VECTORS WITH DATA THAT KEEPS TRACK OF A BOUNDING BOX FOR THE MESH (BASED ON POSITION AND OFFSET)
     // FIGURE OUT BETTER WAY OF ORGANIZING SHADERS
     // FIGURE OUT BETTER WAY OF ORGANIZING TEXTURES AND QUADS (LAYERS)
@@ -311,7 +308,8 @@ void GLSheet::paintGL()
                 glBindTexture(GL_TEXTURE_2D, background->textureId());
                 m_program[TEXTURE]->setAttributeBuffer(1, GL_FLOAT, Vertex2D::texCoordsOffset(), Vertex2D::TexCoordsTupleSize, Vertex2D::stride());
                 m_program[TEXTURE]->setUniformValue(m_program[TEXTURE]->uniformLocation("sampler"), 0);
-                m_program[TEXTURE]->setUniformValue(m_program[TEXTURE]->uniformLocation("modelviewprojection"), cam.GetViewProjection() * trans.GetModel());
+                m_program[TEXTURE]->setUniformValue(m_program[TEXTURE]->uniformLocation("viewprojection"), cam.GetViewProjection());
+                m_program[TEXTURE]->setUniformValue(m_program[TEXTURE]->uniformLocation("modelview"),  trans.GetModel());
                 m_vertex.allocate(backTarget.data(), static_cast<int>(sizeof(backTarget.data()[0]) * backTarget.size()));
                 m_index.allocate(layerTargetIndex.data(), static_cast<int>(sizeof(layerTargetIndex.data()[0]) * layerTargetIndex.size()));
                 glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(layerTargetIndex.size()), GL_UNSIGNED_INT, nullptr);
@@ -328,9 +326,10 @@ void GLSheet::paintGL()
             m_program[TEXTURE]->release();
             m_program[currentBrushShader]->bind(); {
                 m_program[currentBrushShader]->setAttributeBuffer(1, GL_FLOAT, Vertex2D::colorOffset(), Vertex2D::ColorTupleSize, Vertex2D::stride());
-                m_program[currentBrushShader]->setUniformValue(m_program[currentBrushShader]->uniformLocation("modelviewprojection"),
+                m_program[currentBrushShader]->setUniformValue(m_program[currentBrushShader]->uniformLocation("viewprojection"),
                                                                Camera(QVector3D(0,0,0), 0, originalSize.width(),
-                                                                      originalSize.height(), 0, 1, -1).GetViewProjection() * Transform(trans.GetPos()).GetModel());
+                                                                      originalSize.height(), 0, 1, -1).GetViewProjection());
+                m_program[currentBrushShader]->setUniformValue(m_program[currentBrushShader]->uniformLocation("modelview"), Transform(trans.GetPos()).GetModel());
                 //DRAWING
                 f.glBlendFuncSeparate(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_DST_ALPHA);
                 f.glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
@@ -339,9 +338,10 @@ void GLSheet::paintGL()
                 rendered = true;
                 //currentTool->cleanUp();
                 if(drawGrid && trans.GetScale().x() >= 20) {
-                    m_program[currentBrushShader]->setUniformValue(m_program[currentBrushShader]->uniformLocation("modelviewprojection"),
+                    m_program[currentBrushShader]->setUniformValue(m_program[currentBrushShader]->uniformLocation("viewprojection"),
                                                                    Camera(QVector3D(0,0,0), 0, width(),
-                                                                          height(), 0, 1, -1).GetViewProjection() * trans.GetModel());
+                                                                          height(), 0, 1, -1).GetViewProjection());
+                    m_program[currentBrushShader]->setUniformValue(m_program[currentBrushShader]->uniformLocation("modelview"), trans.GetModel());
                     glViewport(0,0, width(), height());
                     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                     m_vertex.allocate(grid.data(), static_cast<int>(sizeof(grid.data()[0]) * grid.size()));
