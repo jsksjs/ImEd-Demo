@@ -337,11 +337,14 @@ void GLSheet::paintGL()
                 (*currentLayer).DrawBuffer(f, &m_vertex, &m_index, &currentMesh, &currentIndex);
                 rendered = true;
                 //currentTool->cleanUp();
+            }
+            m_program[currentBrushShader]->release();
+            m_program[SQUARE]->bind();{
                 if(drawGrid && trans.GetScale().x() >= 20) {
-                    m_program[currentBrushShader]->setUniformValue(m_program[currentBrushShader]->uniformLocation("viewprojection"),
+                    m_program[SQUARE]->setUniformValue(m_program[currentBrushShader]->uniformLocation("viewprojection"),
                                                                    Camera(QVector3D(0,0,0), 0, width(),
                                                                           height(), 0, 1, -1).GetViewProjection());
-                    m_program[currentBrushShader]->setUniformValue(m_program[currentBrushShader]->uniformLocation("modelview"), trans.GetModel());
+                    m_program[SQUARE]->setUniformValue(m_program[currentBrushShader]->uniformLocation("modelview"), trans.GetModel());
                     glViewport(0,0, width(), height());
                     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                     m_vertex.allocate(grid.data(), static_cast<int>(sizeof(grid.data()[0]) * grid.size()));
@@ -349,7 +352,7 @@ void GLSheet::paintGL()
                     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(gridIndex.size()), GL_UNSIGNED_INT, nullptr);
                 }
             }
-            m_program[currentBrushShader]->release();
+            m_program[SQUARE]->release();
         }
         m_index.release();
         m_object.release();

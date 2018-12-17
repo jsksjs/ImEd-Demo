@@ -799,13 +799,13 @@ QComboBox QAbstractItemView {
    </property>
    <property name="styleSheet">
     <string notr="true">QDockWidget::title[right=false]{
-	 padding-left: 12;
+	 padding-left: 18;
 	 padding-right: 0;
 }
 
 QDockWidget::title[right=true]{
 	 padding-left: 0;
-	 padding-right: 12;
+	 padding-right: 18;
 }
 
 QDockWidget * QToolButton{

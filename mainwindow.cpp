@@ -201,7 +201,7 @@ void MainWindow::statusWidgets()
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    const qint16 maxWidth = this->width()/3;
+    const qint16 maxWidth = static_cast<qint16>(this->width()/3);
     foreach (QDockWidget *a, docks) {
         a->setMaximumWidth(maxWidth);
     }
@@ -248,7 +248,7 @@ void MainWindow::createCanvas(const QSize size, const QPoint pos)
 
     canvas->scalePercent(zoomPercent->value());
     canvas->antialiased(ui->checkBoxAA->isChecked());
-    canvas->brushSize(ui->paintSizeSpin->value());
+    canvas->brushSize(static_cast<int>(ui->paintSizeSpin->value()));
     canvas->setGridEnabled(ui->actionGrid->isChecked());
 
     // layer
@@ -292,7 +292,7 @@ void MainWindow::grid(const bool e)
  */
 QVector4D MainWindow::colorToNVecF(const QColor color)
 {
-    return QVector4D(color.redF(), color.greenF(), color.blueF(), color.alphaF());
+    return QVector4D(static_cast<float>(color.redF()), static_cast<float>(color.greenF()), static_cast<float>(color.blueF()), static_cast<float>(color.alphaF()));
 }
 
 /**
